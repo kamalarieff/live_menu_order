@@ -1,21 +1,10 @@
 <h1>Show Menu</h1>
 
-<%= if @live_action in [:edit] do %>
-  <.modal return_to={Routes.menu_show_path(@socket, :show, @menu)}>
-    <.live_component
-      module={LiveMenuOrderWeb.MenuLive.FormComponent}
-      id={@menu.id}
-      title={@page_title}
-      action={@live_action}
-      menu={@menu}
-      return_to={Routes.menu_show_path(@socket, :show, @menu)}
-    />
-  </.modal>
-<% end %>
-
 <ul>
-
+  <li>
+    <strong>Name:</strong>
+    <%= @menu.name %>
+  </li>
 </ul>
 
-<span><%= live_patch "Edit", to: Routes.menu_show_path(@socket, :edit, @menu), class: "button" %></span> |
 <span><%= live_redirect "Back", to: Routes.menu_index_path(@socket, :index) %></span>

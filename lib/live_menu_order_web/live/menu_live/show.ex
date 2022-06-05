@@ -17,5 +17,4 @@ defmodule LiveMenuOrderWeb.MenuLive.Show do
   end
 
   defp page_title(:show), do: "Show Menu"
-  defp page_title(:edit), do: "Edit Menu"
 end
