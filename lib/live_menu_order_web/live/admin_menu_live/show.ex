@@ -1,4 +1,4 @@
-defmodule LiveMenuOrderWeb.MenuLive.Show do
+defmodule LiveMenuOrderWeb.AdminMenuLive.Show do
   use LiveMenuOrderWeb, :live_view
 
   alias LiveMenuOrder.Menus

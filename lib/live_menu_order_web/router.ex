@@ -18,12 +18,12 @@ defmodule LiveMenuOrderWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    live "/admin/menus", MenuLive.Index, :index
-    live "/admin/menus/new", MenuLive.Index, :new
-    live "/admin/menus/:id/edit", MenuLive.Index, :edit
+    live "/admin/menus", AdminMenuLive.Index, :index
+    live "/admin/menus/new", AdminMenuLive.Index, :new
+    live "/admin/menus/:id/edit", AdminMenuLive.Index, :edit
 
-    live "/admin/menus/:id", MenuLive.Show, :show
-    live "/admin/menus/:id/show/edit", MenuLive.Show, :edit
+    live "/admin/menus/:id", AdminMenuLive.Show, :show
+    live "/admin/menus/:id/show/edit", AdminMenuLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

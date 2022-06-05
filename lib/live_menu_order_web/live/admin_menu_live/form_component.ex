@@ -1,4 +1,4 @@
-defmodule LiveMenuOrderWeb.MenuLive.FormComponent do
+defmodule LiveMenuOrderWeb.AdminMenuLive.FormComponent do
   use LiveMenuOrderWeb, :live_component
 
   alias LiveMenuOrder.Menus

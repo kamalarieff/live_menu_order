@@ -12,13 +12,13 @@ defmodule LiveMenuOrderWeb.LiveHelpers do
 
   ## Examples
 
-      <.modal return_to={Routes.menu_index_path(@socket, :index)}>
+      <.modal return_to={Routes.admin_menu_index_path(@socket, :index)}>
         <.live_component
-          module={LiveMenuOrderWeb.MenuLive.FormComponent}
+          module={LiveMenuOrderWeb.AdminMenuLive.FormComponent}
           id={@menu.id || :new}
           title={@page_title}
           action={@live_action}
-          return_to={Routes.menu_index_path(@socket, :index)}
+          return_to={Routes.admin_menu_index_path(@socket, :index)}
           menu: @menu
         />
       </.modal>
