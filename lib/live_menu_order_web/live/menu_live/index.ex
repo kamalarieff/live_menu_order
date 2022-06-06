@@ -32,14 +32,10 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     new_cart =
       case Map.has_key?(state, payload["menu_id"]) do
         true ->
-          temp = Map.get(state, payload["menu_id"])
+          {_old, new_state} =
+            get_and_update_in(state, [payload["menu_id"], "count"], &{&1, &1 + 1})
 
-          {_current_value, new_value} =
-            Map.get_and_update(temp, "count", fn current_value ->
-              {current_value, current_value + 1}
-            end)
-
-          Map.put(state, payload["menu_id"], new_value)
+          new_state
 
         false ->
           temp = %{payload["menu_id"] => Map.merge(payload, %{"count" => 1})}
@@ -89,14 +85,8 @@ defmodule CartState do
     Agent.update(__MODULE__, fn state ->
       case Map.has_key?(state, value["menu_id"]) do
         true ->
-          temp = Map.get(state, value["menu_id"])
-
-          {_current_value, new_value} =
-            Map.get_and_update(temp, "count", fn current_value ->
-              {current_value, current_value + 1}
-            end)
-
-          Map.put(state, value["menu_id"], new_value)
+          {_old, new_state} = get_and_update_in(state, [value["menu_id"], "count"], &{&1, &1 + 1})
+          new_state
 
         false ->
           temp = %{value["menu_id"] => Map.merge(value, %{"count" => 1})}
