@@ -18,7 +18,7 @@ defmodule LiveMenuOrder.Application do
       LiveMenuOrderWeb.Endpoint,
       # Start a worker by calling: LiveMenuOrder.Worker.start_link(arg)
       # {LiveMenuOrder.Worker, arg},
-      CartState
+      {CartState, %{}}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

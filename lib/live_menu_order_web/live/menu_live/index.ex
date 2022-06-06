@@ -20,7 +20,24 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def handle_info(%{event: "add_to_cart", payload: payload}, socket) do
-    new_cart = socket.assigns.cart ++ [payload]
+    state = socket.assigns.cart
+
+    new_cart =
+      case Map.has_key?(state, payload["menu_id"]) do
+        true ->
+          temp = Map.get(state, payload["menu_id"])
+
+          {_current_value, new_value} =
+            Map.get_and_update(temp, "count", fn current_value ->
+              {current_value, current_value + 1}
+            end)
+
+          Map.put(state, payload["menu_id"], new_value)
+
+        false ->
+          temp = %{payload["menu_id"] => Map.merge(payload, %{"count" => 1})}
+          Map.merge(state, temp)
+      end
 
     {:noreply,
      socket
@@ -45,7 +62,21 @@ defmodule CartState do
 
   def add(value) do
     Agent.update(__MODULE__, fn state ->
-      state ++ [value]
+      case Map.has_key?(state, value["menu_id"]) do
+        true ->
+          temp = Map.get(state, value["menu_id"])
+
+          {_current_value, new_value} =
+            Map.get_and_update(temp, "count", fn current_value ->
+              {current_value, current_value + 1}
+            end)
+
+          Map.put(state, value["menu_id"], new_value)
+
+        false ->
+          temp = %{value["menu_id"] => Map.merge(value, %{"count" => 1})}
+          Map.merge(state, temp)
+      end
     end)
   end
 end

@@ -1,8 +1,11 @@
 <h1>Menu</h1>
 
 <ul>
-  <%= for item <- @cart do %>
-    <li><%= item["menu_name"] %></li>
+  <%= for {_id, item} <- @cart do %>
+    <li>
+      <%= item["menu_name"] %>
+      <%= item["count"] %>
+    </li>
   <% end %>
 </ul>
 
