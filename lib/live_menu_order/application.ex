@@ -15,9 +15,10 @@ defmodule LiveMenuOrder.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: LiveMenuOrder.PubSub},
       # Start the Endpoint (http/https)
-      LiveMenuOrderWeb.Endpoint
+      LiveMenuOrderWeb.Endpoint,
       # Start a worker by calling: LiveMenuOrder.Worker.start_link(arg)
-      # {LiveMenuOrder.Worker, arg}
+      # {LiveMenuOrder.Worker, arg},
+      CartState
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
