@@ -19,6 +19,13 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   end
 
   @impl true
+  def handle_event("remove", value, socket) do
+    CartState.remove(value)
+    LiveMenuOrderWeb.Endpoint.broadcast("orders", "remove_from_cart", value)
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info(%{event: "add_to_cart", payload: payload}, socket) do
     state = socket.assigns.cart
 
@@ -37,6 +44,24 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
         false ->
           temp = %{payload["menu_id"] => Map.merge(payload, %{"count" => 1})}
           Map.merge(state, temp)
+      end
+
+    {:noreply,
+     socket
+     |> assign(:cart, new_cart)}
+  end
+
+  @impl true
+  def handle_info(%{event: "remove_from_cart", payload: payload}, socket) do
+    state = socket.assigns.cart
+
+    {_old, new_state} = get_and_update_in(state, [payload["menu_id"], "count"], &{&1, &1 - 1})
+    count = get_in(new_state, [payload["menu_id"], "count"])
+
+    new_cart =
+      case count do
+        0 -> Map.delete(new_state, payload["menu_id"])
+        _ -> new_state
       end
 
     {:noreply,
@@ -76,6 +101,18 @@ defmodule CartState do
         false ->
           temp = %{value["menu_id"] => Map.merge(value, %{"count" => 1})}
           Map.merge(state, temp)
+      end
+    end)
+  end
+
+  def remove(value) do
+    Agent.update(__MODULE__, fn state ->
+      {_old, new_state} = get_and_update_in(state, [value["menu_id"], "count"], &{&1, &1 - 1})
+      count = get_in(new_state, [value["menu_id"], "count"])
+
+      case count do
+        0 -> Map.delete(new_state, value["menu_id"])
+        _ -> new_state
       end
     end)
   end

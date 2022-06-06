@@ -5,6 +5,7 @@
     <li>
       <%= item["menu_name"] %>
       <%= item["count"] %>
+      <button phx-click="remove" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Remove</button>
     </li>
   <% end %>
 </ul>
