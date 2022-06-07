@@ -4,6 +4,7 @@ defmodule LiveMenuOrder.Menus.Menu do
 
   schema "menus" do
     field :name, :string
+    field :price, :float
 
     timestamps()
   end
@@ -11,7 +12,7 @@ defmodule LiveMenuOrder.Menus.Menu do
   @doc false
   def changeset(menu, attrs) do
     menu
-    |> cast(attrs, [:name])
-    |> validate_required([:name])
+    |> cast(attrs, [:name, :price])
+    |> validate_required([:name, :price])
   end
 end

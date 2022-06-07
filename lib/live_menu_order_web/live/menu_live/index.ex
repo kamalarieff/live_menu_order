@@ -8,7 +8,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   def mount(_params, _session, socket) do
     if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe("orders")
     cart = CartState.value()
-    {:ok, assign(socket, menus: list_menus(), cart: cart)}
+    {:ok, assign(socket, menus: list_menus(), cart: cart, total: 0)}
   end
 
   @impl true
@@ -29,9 +29,16 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def handle_info(%{event: "update_state", payload: state}, socket) do
+    total =
+      for {_id, item} <- state, reduce: 0 do
+        acc ->
+          item["total_price"] + acc
+      end
+
     {:noreply,
      socket
-     |> assign(:cart, state)}
+     |> assign(:cart, state)
+     |> assign(:total, total)}
   end
 
   defp list_menus do
@@ -54,11 +61,27 @@ defmodule CartState do
     Agent.update(__MODULE__, fn state ->
       case Map.has_key?(state, value["menu_id"]) do
         true ->
-          {_old, new_state} = get_and_update_in(state, [value["menu_id"], "count"], &{&1, &1 + 1})
+          new_state =
+            update_in(state, [value["menu_id"]], fn current_value ->
+              new_count = current_value["count"] + 1
+
+              Map.merge(current_value, %{
+                "count" => new_count,
+                "total_price" => new_count * String.to_float(current_value["menu_price"])
+              })
+            end)
+
           new_state
 
         false ->
-          temp = %{value["menu_id"] => Map.merge(value, %{"count" => 1})}
+          temp = %{
+            value["menu_id"] =>
+              Map.merge(value, %{
+                "count" => 1,
+                "total_price" => String.to_float(value["menu_price"])
+              })
+          }
+
           Map.merge(state, temp)
       end
     end)
@@ -66,7 +89,16 @@ defmodule CartState do
 
   def remove(value) do
     Agent.update(__MODULE__, fn state ->
-      {_old, new_state} = get_and_update_in(state, [value["menu_id"], "count"], &{&1, &1 - 1})
+      new_state =
+        update_in(state, [value["menu_id"]], fn current_value ->
+          new_count = current_value["count"] - 1
+
+          Map.merge(current_value, %{
+            "count" => new_count,
+            "total_price" => new_count * String.to_float(current_value["menu_price"])
+          })
+        end)
+
       count = get_in(new_state, [value["menu_id"], "count"])
 
       case count do

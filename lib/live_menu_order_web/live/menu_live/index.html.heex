@@ -5,10 +5,13 @@
     <li>
       <%= item["menu_name"] %>
       <%= item["count"] %>
+      <%= item["total_price"] %>
       <button phx-click="remove" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Remove</button>
     </li>
   <% end %>
 </ul>
+
+<span>Total: <%= @total %></span>
 
 <table>
   <thead>
@@ -22,12 +25,21 @@
     <%= for menu <- @menus do %>
       <tr id={"menu-#{menu.id}"}>
         <td><%= menu.name %></td>
+        <td><%= menu.price %></td>
 
         <td>
           <span><%= live_redirect "Show", to: Routes.menu_show_path(@socket, :show, menu) %></span>
         </td>
         <td>
-          <button type="button" phx-click="add" phx-value-menu_id={menu.id} phx-value-menu_name={menu.name}>Add</button>
+          <button
+            type="button"
+            phx-click="add"
+            phx-value-menu_id={menu.id}
+            phx-value-menu_name={menu.name}
+            phx-value-menu_price={menu.price}
+          >
+            Add
+          </button>
         </td>
       </tr>
     <% end %>
