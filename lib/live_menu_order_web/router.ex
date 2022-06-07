@@ -27,6 +27,13 @@ defmodule LiveMenuOrderWeb.Router do
 
     live "/menu", MenuLive.Index, :index
     live "/menu/:id", MenuLive.Show, :show
+
+    live "/admin/orders", OrderLive.Index, :index
+    live "/admin/orders/new", OrderLive.Index, :new
+    live "/admin/orders/:id/edit", OrderLive.Index, :edit
+
+    live "/admin/orders/:id", OrderLive.Show, :show
+    live "/admin/orders/:id/show/edit", OrderLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

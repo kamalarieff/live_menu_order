@@ -2,7 +2,10 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   use LiveMenuOrderWeb, :live_view
 
   alias LiveMenuOrder.Menus
+  alias LiveMenuOrder.Orders
+  alias LiveMenuOrder.Orders.Order
   alias CartState
+  alias Phoenix.LiveView.JS
 
   @impl true
   def mount(_params, _session, socket) do
@@ -24,6 +27,12 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     CartState.remove(value)
     cart_state = CartState.value()
     LiveMenuOrderWeb.Endpoint.broadcast("orders", "update_state", cart_state)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("save_order", %{"order" => order}, socket) do
+    Orders.create_order(%{order: order, total: socket.assigns.total})
     {:noreply, socket}
   end
 

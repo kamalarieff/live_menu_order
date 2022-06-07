@@ -12,6 +12,7 @@
 </ul>
 
 <span>Total: <%= @total %></span>
+<button phx-click={JS.push("save_order", value: %{order: @cart})}>Save Order</button>
 
 <table>
   <thead>
