@@ -47,8 +47,16 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def handle_event("save_order", %{"order" => order}, socket) do
-    Orders.create_order(%{order: order, total: socket.assigns.total})
-    {:noreply, socket}
+    {:ok, order} = Orders.create_order(%{order: order, total: socket.assigns.total})
+    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, @process_name)
+    DynamicSupervisor.terminate_child(LiveMenuOrder.DynamicSupervisor, pid)
+
+    {:noreply,
+     socket
+     |> assign(cart: [])
+     |> assign(total: 0)
+     |> push_redirect(to: Routes.order_show_path(socket, :show, order))
+    }
   end
 
   @impl true
