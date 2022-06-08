@@ -18,7 +18,8 @@ defmodule LiveMenuOrder.Application do
       LiveMenuOrderWeb.Endpoint,
       # Start a worker by calling: LiveMenuOrder.Worker.start_link(arg)
       # {LiveMenuOrder.Worker, arg},
-      {CartState, %{}}
+      {Registry, keys: :unique, name: LiveMenuOrder.Registry},
+      {DynamicSupervisor, strategy: :one_for_one, name: LiveMenuOrder.DynamicSupervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

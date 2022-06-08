@@ -3,29 +3,44 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   alias LiveMenuOrder.Menus
   alias LiveMenuOrder.Orders
-  alias LiveMenuOrder.Orders.Order
   alias CartState
   alias Phoenix.LiveView.JS
+
+  @process_name "table:order"
+  @cart_name {:via, Registry, {LiveMenuOrder.Registry, @process_name}}
 
   @impl true
   def mount(_params, _session, socket) do
     if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe("orders")
-    cart = CartState.value()
-    {:ok, assign(socket, menus: list_menus(), cart: cart, total: 0)}
+
+    DynamicSupervisor.start_child(
+      LiveMenuOrder.DynamicSupervisor,
+      {CartState, %{initial_value: %{}, name: @cart_name}}
+    )
+
+    cart = CartState.value(@cart_name)
+
+    total =
+      for {_id, item} <- cart, reduce: 0 do
+        acc ->
+          item["total_price"] + acc
+      end
+
+    {:ok, assign(socket, menus: list_menus(), cart: cart, total: total)}
   end
 
   @impl true
   def handle_event("add", value, socket) do
-    CartState.add(value)
-    cart_state = CartState.value()
+    CartState.add(@cart_name, value)
+    cart_state = CartState.value(@cart_name)
     LiveMenuOrderWeb.Endpoint.broadcast("orders", "update_state", cart_state)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("remove", value, socket) do
-    CartState.remove(value)
-    cart_state = CartState.value()
+    CartState.remove(@cart_name, value)
+    cart_state = CartState.value(@cart_name)
     LiveMenuOrderWeb.Endpoint.broadcast("orders", "update_state", cart_state)
     {:noreply, socket}
   end
@@ -58,16 +73,16 @@ end
 defmodule CartState do
   use Agent
 
-  def start_link(initial_value) do
-    Agent.start_link(fn -> initial_value end, name: __MODULE__)
+  def start_link(%{initial_value: initial_value, name: name}) do
+    Agent.start_link(fn -> initial_value end, name: name)
   end
 
-  def value do
-    Agent.get(__MODULE__, & &1)
+  def value(name) do
+    Agent.get(name, & &1)
   end
 
-  def add(value) do
-    Agent.update(__MODULE__, fn state ->
+  def add(name, value) do
+    Agent.update(name, fn state ->
       case Map.has_key?(state, value["menu_id"]) do
         true ->
           new_state =
@@ -96,8 +111,8 @@ defmodule CartState do
     end)
   end
 
-  def remove(value) do
-    Agent.update(__MODULE__, fn state ->
+  def remove(name, value) do
+    Agent.update(name, fn state ->
       new_state =
         update_in(state, [value["menu_id"]], fn current_value ->
           new_count = current_value["count"] - 1
