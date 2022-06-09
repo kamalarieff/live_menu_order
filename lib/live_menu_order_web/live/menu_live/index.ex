@@ -3,22 +3,24 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   alias LiveMenuOrder.Menus
   alias LiveMenuOrder.Orders
+  alias LiveMenuOrder.Tables.Table
   alias CartState
   alias Phoenix.LiveView.JS
 
-  @process_name "table:order"
-  @cart_name {:via, Registry, {LiveMenuOrder.Registry, @process_name}}
-
   @impl true
-  def mount(_params, _session, socket) do
-    if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe("orders")
+  def mount(%{"table_id" => table_id}, _session, socket) do
+    if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe(cart_topic(table_id))
+
+    table = %Table{id: table_id}
+
+    cart_name = via_tuple(table_id)
 
     DynamicSupervisor.start_child(
       LiveMenuOrder.DynamicSupervisor,
-      {CartState, %{initial_value: %{}, name: @cart_name}}
+      {CartState, %{initial_value: %{}, name: cart_name}}
     )
 
-    cart = CartState.value(@cart_name)
+    cart = CartState.value(cart_name)
 
     total =
       for {_id, item} <- cart, reduce: 0 do
@@ -26,37 +28,44 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
           item["total_price"] + acc
       end
 
-    {:ok, assign(socket, menus: list_menus(), cart: cart, total: total)}
+    {:ok, assign(socket, menus: list_menus(), cart: cart, total: total, table: table)}
   end
 
   @impl true
   def handle_event("add", value, socket) do
-    CartState.add(@cart_name, value)
-    cart_state = CartState.value(@cart_name)
-    LiveMenuOrderWeb.Endpoint.broadcast("orders", "update_state", cart_state)
+    cart_name = via_tuple(socket.assigns.table.id)
+    CartState.add(cart_name, value)
+    cart_state = CartState.value(cart_name)
+    LiveMenuOrderWeb.Endpoint.broadcast(cart_topic(socket.assigns.table.id), "update_state", cart_state)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("remove", value, socket) do
-    CartState.remove(@cart_name, value)
-    cart_state = CartState.value(@cart_name)
-    LiveMenuOrderWeb.Endpoint.broadcast("orders", "update_state", cart_state)
+    cart_name = via_tuple(socket.assigns.table.id)
+    CartState.remove(cart_name, value)
+    cart_state = CartState.value(cart_name)
+    LiveMenuOrderWeb.Endpoint.broadcast(cart_topic(socket.assigns.table.id), "update_state", cart_state)
     {:noreply, socket}
   end
 
   @impl true
   def handle_event("save_order", %{"order" => order}, socket) do
-    {:ok, order} = Orders.create_order(%{order: order, total: socket.assigns.total})
-    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, @process_name)
+    {:ok, order} =
+      Orders.create_order(%{
+        order: order,
+        total: socket.assigns.total,
+        table_id: socket.assigns.table.id
+      })
+
+    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(socket.assigns.table.id))
     DynamicSupervisor.terminate_child(LiveMenuOrder.DynamicSupervisor, pid)
 
     {:noreply,
      socket
      |> assign(cart: [])
      |> assign(total: 0)
-     |> push_redirect(to: Routes.order_show_path(socket, :show, order))
-    }
+     |> push_redirect(to: Routes.order_show_path(socket, :show, order.table_id))}
   end
 
   @impl true
@@ -76,6 +85,19 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   defp list_menus do
     Menus.list_menus()
   end
+
+  defp process_name(table_id) do
+    "table:" <> table_id
+  end
+
+  defp cart_topic(table_id) do
+    "orders:" <> table_id
+  end
+
+  defp via_tuple(table_id) do
+    {:via, Registry, {LiveMenuOrder.Registry, process_name(table_id)}}
+  end
+
 end
 
 defmodule CartState do

@@ -50,7 +50,6 @@ defmodule LiveMenuOrder.Orders do
 
   """
   def create_order(attrs \\ %{}) do
-    IO.inspect(attrs, label: "attrs")
     %Order{}
     |> Order.changeset(attrs)
     |> Repo.insert()

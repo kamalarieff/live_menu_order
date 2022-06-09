@@ -5,6 +5,7 @@ defmodule LiveMenuOrder.Orders.Order do
   schema "orders" do
     field :order, :map
     field :total, :float
+    belongs_to :table, LiveMenuOrder.Tables.Table
 
     timestamps()
   end
@@ -12,7 +13,7 @@ defmodule LiveMenuOrder.Orders.Order do
   @doc false
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [:order, :total])
-    |> validate_required([:order, :total])
+    |> cast(attrs, [:order, :total, :table_id])
+    |> validate_required([:order, :total, :table_id])
   end
 end

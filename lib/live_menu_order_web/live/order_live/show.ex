@@ -1,7 +1,7 @@
 defmodule LiveMenuOrderWeb.OrderLive.Show do
   use LiveMenuOrderWeb, :live_view
 
-  alias LiveMenuOrder.Orders
+  alias LiveMenuOrder.Tables
 
   @impl true
   def mount(_params, _session, socket) do
@@ -9,11 +9,14 @@ defmodule LiveMenuOrderWeb.OrderLive.Show do
   end
 
   @impl true
-  def handle_params(%{"id" => id}, _, socket) do
+  def handle_params(%{"table_id" => table_id}, _, socket) do
+    table = Tables.get_table!(table_id)
+    orders = Enum.reverse(table.orders)
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:order, Orders.get_order!(id))}
+     |> assign(:orders, orders)}
   end
 
   defp page_title(:show), do: "Show Order"
