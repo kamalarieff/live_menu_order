@@ -10,13 +10,33 @@ defmodule LiveMenuOrderWeb.TableLive.Show do
 
   @impl true
   def handle_params(%{"id" => id}, _, socket) do
+    if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe(table_topic(id))
     table = Tables.get_table!(id)
+
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(:table, table)}
   end
 
+  @impl true
+  def handle_info(%{event: "save_order"}, socket) do
+    table = Tables.get_table!(socket.assigns.table.id)
+
+    {:noreply,
+     socket
+     |> assign(:table, table)}
+  end
+
+  @impl true
+  def handle_info(%{event: "update_state"}, socket) do
+    {:noreply, socket}
+  end
+
   defp page_title(:show), do: "Show Table"
   defp page_title(:edit), do: "Edit Table"
+
+  defp table_topic(table_id) do
+    "table:" <> table_id
+  end
 end

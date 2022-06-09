@@ -9,7 +9,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def mount(%{"table_id" => table_id}, _session, socket) do
-    if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe(cart_topic(table_id))
+    if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe(table_topic(table_id))
 
     table = %Table{id: table_id}
 
@@ -36,7 +36,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     cart_name = via_tuple(socket.assigns.table.id)
     CartState.add(cart_name, value)
     cart_state = CartState.value(cart_name)
-    LiveMenuOrderWeb.Endpoint.broadcast(cart_topic(socket.assigns.table.id), "update_state", cart_state)
+    LiveMenuOrderWeb.Endpoint.broadcast(table_topic(socket.assigns.table.id), "update_state", cart_state)
     {:noreply, socket}
   end
 
@@ -45,7 +45,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     cart_name = via_tuple(socket.assigns.table.id)
     CartState.remove(cart_name, value)
     cart_state = CartState.value(cart_name)
-    LiveMenuOrderWeb.Endpoint.broadcast(cart_topic(socket.assigns.table.id), "update_state", cart_state)
+    LiveMenuOrderWeb.Endpoint.broadcast(table_topic(socket.assigns.table.id), "update_state", cart_state)
     {:noreply, socket}
   end
 
@@ -58,6 +58,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
         table_id: socket.assigns.table.id
       })
 
+    LiveMenuOrderWeb.Endpoint.broadcast(table_topic(socket.assigns.table.id), "save_order", nil)
     [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(socket.assigns.table.id))
     DynamicSupervisor.terminate_child(LiveMenuOrder.DynamicSupervisor, pid)
 
@@ -82,6 +83,11 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
      |> assign(:total, total)}
   end
 
+  @impl true
+  def handle_info(%{event: "save_order"}, socket) do
+    {:noreply, socket}
+  end
+
   defp list_menus do
     Menus.list_menus()
   end
@@ -90,8 +96,8 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     "table:" <> table_id
   end
 
-  defp cart_topic(table_id) do
-    "orders:" <> table_id
+  defp table_topic(table_id) do
+    "table:" <> table_id
   end
 
   defp via_tuple(table_id) do
