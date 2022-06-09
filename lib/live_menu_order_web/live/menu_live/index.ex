@@ -4,6 +4,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   alias LiveMenuOrder.Menus
   alias LiveMenuOrder.Orders
   alias LiveMenuOrder.Tables.Table
+  alias LiveMenuOrder.DynamicSupervisor
   alias CartState
   alias Phoenix.LiveView.JS
 
@@ -16,7 +17,6 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     cart_name = via_tuple(table_id)
 
     DynamicSupervisor.start_child(
-      LiveMenuOrder.DynamicSupervisor,
       {CartState, %{initial_value: %{}, name: cart_name}}
     )
 
@@ -60,7 +60,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
     LiveMenuOrderWeb.Endpoint.broadcast(table_topic(socket.assigns.table.id), "save_order", nil)
     [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(socket.assigns.table.id))
-    DynamicSupervisor.terminate_child(LiveMenuOrder.DynamicSupervisor, pid)
+    DynamicSupervisor.terminate_child(pid)
 
     {:noreply,
      socket
