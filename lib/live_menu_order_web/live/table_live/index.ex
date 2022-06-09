@@ -42,9 +42,9 @@ defmodule LiveMenuOrderWeb.TableLive.Index do
 
   @impl true
   def handle_event("add_table", _value, socket) do
-    {:ok, changeset} = Tables.create_table()
-    IO.inspect(changeset, label: "changeset")
-    {:noreply, socket}
+    Tables.create_table()
+    {:noreply, socket
+    |> push_redirect(to: Routes.table_index_path(socket, :index))}
   end
 
   defp list_tables do
