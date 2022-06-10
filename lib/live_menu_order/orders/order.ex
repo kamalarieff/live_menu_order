@@ -3,7 +3,7 @@ defmodule LiveMenuOrder.Orders.Order do
   import Ecto.Changeset
 
   schema "orders" do
-    field :order, :map
+    field :order, :map, [default: %{}]
     field :total, :float
     belongs_to :table, LiveMenuOrder.Tables.Table
 

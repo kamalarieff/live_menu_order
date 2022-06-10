@@ -10,13 +10,12 @@ defmodule LiveMenuOrderWeb.OrderLive.Show do
 
   @impl true
   def handle_params(%{"table_id" => table_id}, _, socket) do
-    table = Tables.get_table!(table_id)
-    orders = Enum.reverse(table.orders)
+    order = Tables.get_single_order_by_table(table_id)
 
     {:noreply,
      socket
      |> assign(:page_title, page_title(socket.assigns.live_action))
-     |> assign(:orders, orders)}
+     |> assign(:order, order)}
   end
 
   defp page_title(:show), do: "Show Order"

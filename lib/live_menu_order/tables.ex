@@ -7,6 +7,7 @@ defmodule LiveMenuOrder.Tables do
   alias LiveMenuOrder.Repo
 
   alias LiveMenuOrder.Tables.Table
+  alias LiveMenuOrder.Orders.Order
 
   @doc """
   Returns the list of tables.
@@ -100,5 +101,23 @@ defmodule LiveMenuOrder.Tables do
   """
   def change_table(%Table{} = table, attrs \\ %{}) do
     Table.changeset(table, attrs)
+  end
+
+  @doc """
+  Gets a single order based on the table id.
+
+  ## Examples
+
+      iex> get_single_order_by_table(table_id)
+      %Order{}
+
+  """
+  def get_single_order_by_table(table_id) do
+    Repo.one(
+      from o in Order,
+        where: o.table_id == ^table_id,
+        order_by: [desc: o.id],
+        limit: 1
+    )
   end
 end

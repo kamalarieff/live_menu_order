@@ -13,19 +13,25 @@
   </.modal>
 <% end %>
 
-<ul>
-  <%= for order <- @orders do %>
-    <li>
-      <strong>Order #<%= order.id %> </strong>
-      <%= for {_id, item} <- order.order do %>
-        <%= item["menu_name"] %>
-        <%= item["count"] %>
-        <%= item["total_price"] %>
-      <% end %>
-      <strong>Total <%= order.total %> </strong>
-      <span><%= live_patch "Edit", to: Routes.order_show_path(@socket, :edit, order), class: "button" %></span>
-    </li>
-  <% end %>
-</ul>
+<table>
+  <thead>
+    <tr>
+      <td>Name</td>
+      <td>Count</td>
+      <td>Price</td>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for {_id, item} <- @order.order do %>
+      <tr>
+        <td><%= item["menu_name"] %></td>
+        <td><%= item["count"] %></td>
+        <td><%= item["total_price"] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
 
-<span><%= live_redirect "Back", to: Routes.order_index_path(@socket, :index) %></span>
+<h2>Total: <%= @order.total %></h2>
+
+<span><%= live_redirect "Back to Menu", to: Routes.menu_index_path(@socket, :index, @order.table_id), class: "button" %></span>
