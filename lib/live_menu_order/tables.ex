@@ -115,9 +115,7 @@ defmodule LiveMenuOrder.Tables do
   def get_single_order_by_table(table_id) do
     Repo.one(
       from o in Order,
-        where: o.table_id == ^table_id,
-        order_by: [desc: o.id],
-        limit: 1
+        where: o.table_id == ^table_id and o.status == "active"
     )
   end
 end

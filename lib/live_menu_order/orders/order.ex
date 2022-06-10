@@ -5,6 +5,7 @@ defmodule LiveMenuOrder.Orders.Order do
   schema "orders" do
     field :order, :map, [default: %{}]
     field :total, :float
+    field :status, :string
     belongs_to :table, LiveMenuOrder.Tables.Table
 
     timestamps()
