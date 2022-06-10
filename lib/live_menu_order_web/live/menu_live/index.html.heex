@@ -28,6 +28,7 @@
       <%= item["count"] %>
       <%= item["total_price"] %>
       <button phx-click="remove" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Remove</button>
+      <button phx-click="add" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Add</button>
     </li>
   <% end %>
 </ul>
