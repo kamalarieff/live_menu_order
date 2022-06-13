@@ -14,20 +14,39 @@
 <% end %>
 
 <h2>Orders</h2>
-<ul>
-  <%= for order <- Enum.reverse(@table.orders) do %>
-    <li>
-      <strong>Order #<%= order.id %></strong>
-      <%= for {_id, item} <- order.order do %>
-        <%= item["menu_name"] %>
-        <%= item["count"] %>
-        <%= item["total_price"] %>
+<%= for {status, orders} <- Enum.reverse(@table.orders) |> Enum.group_by(&(&1.status)) do %>
+  <%= if status == "active" do %>
+    <h3>Active Order</h3>
+    <ul>
+      <%= for order <- orders do %>
+        <li>
+          <strong>Order #<%= order.id %></strong>
+          <%= for {_id, item} <- order.order do %>
+            <%= item["menu_name"] %>
+            <%= item["count"] %>
+            <%= item["total_price"] %>
+          <% end %>
+          <strong>Total: <%= order.total %></strong>
+        </li>
       <% end %>
-      <strong>Total: <%= order.total %></strong>
-    </li>
+    </ul>
+  <% else %>
+    <h3>Past Orders</h3>
+    <ul>
+      <%= for order <- orders do %>
+        <li>
+          <strong>Order #<%= order.id %></strong>
+          <%= for {_id, item} <- order.order do %>
+            <%= item["menu_name"] %>
+            <%= item["count"] %>
+            <%= item["total_price"] %>
+          <% end %>
+          <strong>Total: <%= order.total %></strong>
+        </li>
+      <% end %>
+    </ul>
   <% end %>
-
-</ul>
+<% end %>
 
 <span><%= live_patch "Edit", to: Routes.table_show_path(@socket, :edit, @table), class: "button" %></span> |
 <span><%= live_redirect "Back", to: Routes.table_index_path(@socket, :index) %></span>
