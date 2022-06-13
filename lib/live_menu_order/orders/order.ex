@@ -14,7 +14,7 @@ defmodule LiveMenuOrder.Orders.Order do
   @doc false
   def changeset(order, attrs) do
     order
-    |> cast(attrs, [:order, :total, :table_id])
+    |> cast(attrs, [:order, :total, :table_id, :status])
     |> validate_required([:order, :total, :table_id])
   end
 end

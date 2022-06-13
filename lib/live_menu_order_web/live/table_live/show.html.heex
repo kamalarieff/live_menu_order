@@ -28,6 +28,7 @@
           <% end %>
           <strong>Total: <%= order.total %></strong>
         </li>
+        <button class="button" phx-click="pay" phx-value-id={order.id}>Pay</button>
       <% end %>
     </ul>
   <% else %>

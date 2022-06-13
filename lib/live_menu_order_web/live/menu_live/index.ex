@@ -141,6 +141,13 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     {:noreply, socket}
   end
 
+  @impl true
+  def handle_info(%{event: "kick"}, socket) do
+    {:noreply,
+     socket
+     |> put_flash(:info, "Order is now inactive.")}
+  end
+
   defp list_menus do
     Menus.list_menus()
   end
