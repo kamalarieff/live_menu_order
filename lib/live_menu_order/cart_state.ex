@@ -59,4 +59,8 @@ defmodule CartState do
       end
     end)
   end
+
+  def clear(name) do
+    Agent.update(name, fn _ -> %{} end)
+  end
 end

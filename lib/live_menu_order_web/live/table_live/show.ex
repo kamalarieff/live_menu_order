@@ -3,6 +3,7 @@ defmodule LiveMenuOrderWeb.TableLive.Show do
 
   alias LiveMenuOrder.Tables
   alias LiveMenuOrder.Orders
+  alias LiveMenuOrder.DynamicSupervisor
 
   @impl true
   def mount(_params, _session, socket) do
@@ -30,6 +31,9 @@ defmodule LiveMenuOrderWeb.TableLive.Show do
       "kick",
       nil
     )
+
+    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(socket.assigns.table.id))
+    DynamicSupervisor.terminate_child(pid)
 
     {:noreply,
      socket
@@ -63,6 +67,14 @@ defmodule LiveMenuOrderWeb.TableLive.Show do
   end
 
   defp table_topic(table_id) do
+    "table:" <> table_id
+  end
+
+  defp process_name(table_id) when is_integer(table_id) do
+    "table:" <> Integer.to_string(table_id)
+  end
+
+  defp process_name(table_id) do
     "table:" <> table_id
   end
 end

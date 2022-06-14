@@ -14,6 +14,11 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   def mount(%{"table_id" => table_id}, _session, socket) do
     if connected?(socket), do: LiveMenuOrderWeb.Endpoint.subscribe(table_topic(table_id))
 
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(%{"table_id" => table_id}, _session, socket) do
     table = %Table{id: table_id}
     order = Tables.get_single_order_by_table(table_id)
 
@@ -41,7 +46,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
           item["total_price"] + acc
       end
 
-    {:ok,
+    {:noreply,
      assign(socket, menus: list_menus(), cart: cart, total: total, table: table, order: order)}
   end
 
@@ -106,8 +111,9 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
       end
 
     LiveMenuOrderWeb.Endpoint.broadcast(table_topic(socket.assigns.table.id), "save_order", nil)
-    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(socket.assigns.table.id))
-    DynamicSupervisor.terminate_child(pid)
+
+    cart_name = via_tuple(socket.assigns.table.id)
+    CartState.clear(cart_name)
 
     {:noreply,
      socket
@@ -118,8 +124,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def handle_event("click_order", %{"table_id" => table_id}, socket) do
-    {:noreply,
-     socket |> push_redirect(to: Routes.order_show_path(socket, :show, table_id))}
+    {:noreply, socket |> push_redirect(to: Routes.order_show_path(socket, :show, table_id))}
   end
 
   @impl true
@@ -144,14 +149,18 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def handle_info(%{event: "save_order"}, socket) do
-    {:noreply, socket}
+    {:noreply,
+     socket
+     |> put_flash(:info, "Order sent.")
+     |> push_patch(to: Routes.menu_index_path(socket, :index, socket.assigns.table.id))}
   end
 
   @impl true
   def handle_info(%{event: "kick"}, socket) do
     {:noreply,
      socket
-     |> put_flash(:info, "Order is now inactive.")}
+     |> put_flash(:info, "Order closed.")
+     |> push_patch(to: Routes.menu_index_path(socket, :index, socket.assigns.table.id))}
   end
 
   defp list_menus do
