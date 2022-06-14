@@ -6,22 +6,8 @@
   <h2 class="mb-0">Total</h2>
   <h2 class="text-right mb-0">RM <%= @total %></h2>
 </div>
-<h1>Menu</h1>
 
-<h2>Cart</h2>
-<ul>
-  <%= for {_id, item} <- @cart do %>
-    <li>
-      <%= item["menu_name"] %>
-      <%= item["count"] %>
-      <%= item["total_price"] %>
-      <button phx-click="remove" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Remove</button>
-      <button phx-click="add" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Add</button>
-    </li>
-  <% end %>
-</ul>
-
-<button phx-click={JS.push("save_order", value: %{order: @cart})}>Save Order</button>
+<h1 class="my-4">Menu</h1>
 
 <table>
   <thead>
@@ -55,3 +41,19 @@
     <% end %>
   </tbody>
 </table>
+
+<button phx-click={JS.push("save_order", value: %{order: @cart})}>Save Order</button>
+
+<h2>Cart</h2>
+<ul>
+  <%= for {_id, item} <- @cart do %>
+    <li>
+      <%= item["menu_name"] %>
+      <%= item["count"] %>
+      <%= item["total_price"] %>
+      <button phx-click="remove" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Remove</button>
+      <button phx-click="add" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Add</button>
+    </li>
+  <% end %>
+</ul>
+
