@@ -37,7 +37,7 @@ defmodule LiveMenuOrderWeb.OrderLive.Show do
     {:noreply,
      socket
      |> put_flash(:info, "Order closed.")
-     |> push_patch(to: Routes.menu_index_path(socket, :index, socket.assigns.table.id))}
+     |> push_redirect(to: Routes.menu_index_path(socket, :index, socket.assigns.order.table_id))}
   end
 
   defp page_title(:show), do: "Show Order"
