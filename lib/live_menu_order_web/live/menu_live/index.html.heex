@@ -54,16 +54,66 @@
 
 <button phx-click={JS.push("save_order", value: %{order: @cart})}>Save Order</button>
 
-<h2>Cart</h2>
-<ul>
-  <%= for {_id, item} <- @cart do %>
-    <li>
-      <%= item["menu_name"] %>
-      <%= item["count"] %>
-      <%= item["total_price"] %>
-      <button phx-click="remove" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Remove</button>
-      <button phx-click="add" phx-value-menu_id={item["menu_id"]} phx-value-menu_name={item["menu_name"]}>Add</button>
-    </li>
-  <% end %>
-</ul>
-
+<h2 class="my-4">Cart</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Count</th>
+      <th>Price</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="cart">
+    <%= for {_id, item} <- @cart do %>
+      <tr>
+        <td>
+          <span><%= live_redirect item["menu_name"], to: Routes.menu_show_path(@socket, :show, item["menu_id"]) %></span>
+        </td>
+        <td><%= item["count"] %></td>
+        <td>RM <%= item["total_price"] %></td>
+        <td class="flex">
+          <svg
+            phx-click="remove"
+            phx-value-menu_id={item["menu_id"]}
+            phx-value-menu_name={item["menu_name"]}
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-circle-minus my-4"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="#ff2825"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9" />
+            <line x1="9" y1="12" x2="15" y2="12" />
+          </svg>
+          <svg
+            phx-click="add"
+            phx-value-menu_id={item["menu_id"]}
+            phx-value-menu_name={item["menu_name"]}
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-circle-plus my-4"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="#00b341"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9" />
+            <line x1="9" y1="12" x2="15" y2="12" />
+            <line x1="12" y1="9" x2="12" y2="15" />
+          </svg>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
