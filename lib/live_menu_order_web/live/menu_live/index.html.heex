@@ -9,33 +9,43 @@
 
 <h1 class="my-4">Menu</h1>
 
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Name</th>
-
-      <th></th>
+      <th>Price</th>
+      <th>Actions</th>
     </tr>
   </thead>
   <tbody id="menus">
     <%= for menu <- @menus do %>
       <tr id={"menu-#{menu.id}"}>
-        <td><%= menu.name %></td>
-        <td><%= menu.price %></td>
-
         <td>
-          <span><%= live_redirect "Show", to: Routes.menu_show_path(@socket, :show, menu) %></span>
+          <span><%= live_redirect menu.name, to: Routes.menu_show_path(@socket, :show, menu) %></span>
         </td>
+        <td>RM <%= menu.price %></td>
         <td>
-          <button
-            type="button"
+          <svg
             phx-click="add"
             phx-value-menu_id={menu.id}
             phx-value-menu_name={menu.name}
             phx-value-menu_price={menu.price}
+            xmlns="http://www.w3.org/2000/svg"
+            class="icon icon-tabler icon-tabler-circle-plus my-4 mx-auto"
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="#00b341"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
           >
-            Add
-          </button>
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+            <circle cx="12" cy="12" r="9" />
+            <line x1="9" y1="12" x2="15" y2="12" />
+            <line x1="12" y1="9" x2="12" y2="15" />
+          </svg>
         </td>
       </tr>
     <% end %>
