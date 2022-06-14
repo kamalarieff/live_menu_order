@@ -117,6 +117,12 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   end
 
   @impl true
+  def handle_event("click_order", %{"table_id" => table_id}, socket) do
+    {:noreply,
+     socket |> push_redirect(to: Routes.order_show_path(socket, :show, table_id))}
+  end
+
+  @impl true
   def handle_info(%{event: "update_state", payload: state}, socket) do
     total =
       for {_id, item} <- socket.assigns.order.order, reduce: 0 do
@@ -164,4 +170,3 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     {:via, Registry, {LiveMenuOrder.Registry, process_name(table_id)}}
   end
 end
-

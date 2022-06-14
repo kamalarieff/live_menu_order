@@ -1,24 +1,12 @@
+<div
+  class="w-full grid grid-cols-2 px-12 py-4 bg-lime-400"
+  phx-click={JS.push("click_order")}
+  phx-value-table_id={@order.table_id}
+>
+  <h2 class="mb-0">Total</h2>
+  <h2 class="text-right mb-0">RM <%= @total %></h2>
+</div>
 <h1>Menu</h1>
-
-<h2>Current Order</h2>
-<table>
-  <thead>
-    <tr>
-      <td>Name</td>
-      <td>Count</td>
-      <td>Price</td>
-    </tr>
-  </thead>
-  <tbody>
-    <%= for {_id, item} <- @order.order do %>
-      <tr>
-        <td><%= item["menu_name"] %></td>
-        <td><%= item["count"] %></td>
-        <td><%= item["total_price"] %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
 
 <h2>Cart</h2>
 <ul>
@@ -33,7 +21,6 @@
   <% end %>
 </ul>
 
-<span>Total: <%= @total %></span>
 <button phx-click={JS.push("save_order", value: %{order: @cart})}>Save Order</button>
 
 <table>
