@@ -18,6 +18,13 @@ defmodule LiveMenuOrder.DynamicSupervisor do
     DynamicSupervisor.terminate_child(__MODULE__, pid)
   end
 
+  def terminate_all_children do
+    children = DynamicSupervisor.which_children(__MODULE__)
+    for {_id, pid, _type, _module} <- children do
+      DynamicSupervisor.terminate_child(__MODULE__, pid)
+    end
+  end
+
   @impl true
   def init(_init_arg) do
     DynamicSupervisor.init(strategy: :one_for_one)
