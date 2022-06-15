@@ -146,7 +146,9 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   end
 
   @impl true
-  def handle_info(%{event: "update_state", payload: %{cart_state: state, last_added: last_added}}, socket) do
+  def handle_info(%{event: "update_state", payload: payload}, socket) do
+    %{cart_state: state, last_added: last_added} = payload
+
     total =
       for {_id, item} <- socket.assigns.order.order, reduce: 0 do
         acc ->
@@ -161,6 +163,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
     {:noreply,
      socket
+     |> push_event("update_state", %{total: total})
      |> assign(:cart, state)
      |> assign(:last_added, last_added)
      |> assign(:total, total)}
@@ -170,6 +173,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   def handle_info(%{event: "save_order"}, socket) do
     last_added_name = via_tuple(:last_added, socket.assigns.table.id)
     LastAddedState.clear(last_added_name)
+
     {:noreply,
      socket
      |> put_flash(:info, "Order sent.")
