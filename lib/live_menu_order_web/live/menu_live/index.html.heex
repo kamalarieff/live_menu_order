@@ -52,10 +52,8 @@
   </tbody>
 </table>
 
-<button phx-click={JS.push("save_order", value: %{order: @cart})}>Save Order</button>
-
 <h2 class="my-4">Cart</h2>
-<table class="table">
+<table class="table mb-0">
   <thead>
     <tr>
       <th>Name</th>
@@ -117,3 +115,14 @@
     <% end %>
   </tbody>
 </table>
+<div
+  class="w-full px-12 pt-4 fixed bottom-0 left-0 bg-sky-300"
+  style="border-top-left-radius: 4.5rem; border-top-right-radius: 4.5rem;"
+>
+  <div class="w-4/5 m-auto grid grid-cols-2 gap-2">
+    <h3 class="mb-0">Total</h3>
+    <h3 class="text-center mb-0">RM <%= @total %></h3>
+    <span><%= @last_added %></span>
+    <button class="col-start-2 text-center" phx-click={JS.push("save_order", value: %{order: @cart})}>Save</button>
+  </div>
+</div>

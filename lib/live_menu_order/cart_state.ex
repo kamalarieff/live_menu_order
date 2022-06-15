@@ -64,3 +64,23 @@ defmodule CartState do
     Agent.update(name, fn _ -> %{} end)
   end
 end
+
+defmodule LastAddedState do
+  use Agent
+
+  def start_link(name) do
+    Agent.start_link(fn -> nil end, name: name)
+  end
+
+  def value(name) do
+    Agent.get(name, & &1)
+  end
+
+  def update(name, value) do
+    Agent.update(name, fn _ -> value["menu_name"] end)
+  end
+
+  def clear(name) do
+    Agent.update(name, fn _ -> nil end)
+  end
+end

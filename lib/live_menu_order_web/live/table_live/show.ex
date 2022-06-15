@@ -32,7 +32,9 @@ defmodule LiveMenuOrderWeb.TableLive.Show do
       nil
     )
 
-    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(socket.assigns.table.id))
+    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(:table, socket.assigns.table.id))
+    DynamicSupervisor.terminate_child(pid)
+    [{pid, _}] = Registry.lookup(LiveMenuOrder.Registry, process_name(:last_added, socket.assigns.table.id))
     DynamicSupervisor.terminate_child(pid)
 
     {:noreply,
@@ -70,11 +72,19 @@ defmodule LiveMenuOrderWeb.TableLive.Show do
     "table:" <> table_id
   end
 
-  defp process_name(table_id) when is_integer(table_id) do
+  defp process_name(:table, table_id) when is_integer(table_id) do
     "table:" <> Integer.to_string(table_id)
   end
 
-  defp process_name(table_id) do
+  defp process_name(:table, table_id) do
     "table:" <> table_id
+  end
+
+  defp process_name(:last_added, table_id) when is_integer(table_id) do
+    "last_added:" <> Integer.to_string(table_id)
+  end
+
+  defp process_name(:last_added, table_id) do
+    "last_added:" <> table_id
   end
 end

@@ -8,6 +8,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   alias LiveMenuOrder.Tables.Table
   alias LiveMenuOrder.DynamicSupervisor
   alias CartState
+  alias LastAddedState
   alias Phoenix.LiveView.JS
 
   @impl true
@@ -28,11 +29,14 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
         _ -> order
       end
 
-    cart_name = via_tuple(table_id)
+    cart_name = via_tuple(:table, table_id)
+    last_added_name = via_tuple(:last_added, table_id)
 
     DynamicSupervisor.start_child({CartState, %{initial_value: %{}, name: cart_name}})
+    DynamicSupervisor.start_child({LastAddedState, last_added_name})
 
     cart = CartState.value(cart_name)
+    last_added = LastAddedState.value(last_added_name)
 
     total =
       for {_id, item} <- order.order, reduce: 0 do
@@ -47,19 +51,30 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
       end
 
     {:noreply,
-     assign(socket, menus: list_menus(), cart: cart, total: total, table: table, order: order)}
+     assign(socket,
+       menus: list_menus(),
+       cart: cart,
+       total: total,
+       table: table,
+       order: order,
+       last_added: last_added
+     )}
   end
 
   @impl true
   def handle_event("add", value, socket) do
-    cart_name = via_tuple(socket.assigns.table.id)
+    cart_name = via_tuple(:table, socket.assigns.table.id)
     CartState.add(cart_name, value)
     cart_state = CartState.value(cart_name)
+
+    last_added_name = via_tuple(:last_added, socket.assigns.table.id)
+    LastAddedState.update(last_added_name, value)
+    last_added = LastAddedState.value(last_added_name)
 
     LiveMenuOrderWeb.Endpoint.broadcast(
       table_topic(socket.assigns.table.id),
       "update_state",
-      cart_state
+      %{cart_state: cart_state, last_added: last_added}
     )
 
     {:noreply, socket}
@@ -67,14 +82,17 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
   @impl true
   def handle_event("remove", value, socket) do
-    cart_name = via_tuple(socket.assigns.table.id)
+    cart_name = via_tuple(:table, socket.assigns.table.id)
     CartState.remove(cart_name, value)
     cart_state = CartState.value(cart_name)
+
+    last_added_name = via_tuple(:last_added, socket.assigns.table.id)
+    last_added = LastAddedState.value(last_added_name)
 
     LiveMenuOrderWeb.Endpoint.broadcast(
       table_topic(socket.assigns.table.id),
       "update_state",
-      cart_state
+      %{cart_state: cart_state, last_added: last_added}
     )
 
     {:noreply, socket}
@@ -112,7 +130,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
 
     LiveMenuOrderWeb.Endpoint.broadcast(table_topic(socket.assigns.table.id), "save_order", nil)
 
-    cart_name = via_tuple(socket.assigns.table.id)
+    cart_name = via_tuple(:table, socket.assigns.table.id)
     CartState.clear(cart_name)
 
     {:noreply,
@@ -128,7 +146,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   end
 
   @impl true
-  def handle_info(%{event: "update_state", payload: state}, socket) do
+  def handle_info(%{event: "update_state", payload: %{cart_state: state, last_added: last_added}}, socket) do
     total =
       for {_id, item} <- socket.assigns.order.order, reduce: 0 do
         acc ->
@@ -144,11 +162,14 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     {:noreply,
      socket
      |> assign(:cart, state)
+     |> assign(:last_added, last_added)
      |> assign(:total, total)}
   end
 
   @impl true
   def handle_info(%{event: "save_order"}, socket) do
+    last_added_name = via_tuple(:last_added, socket.assigns.table.id)
+    LastAddedState.clear(last_added_name)
     {:noreply,
      socket
      |> put_flash(:info, "Order sent.")
@@ -167,15 +188,15 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     Menus.list_menus()
   end
 
-  defp process_name(table_id) do
-    "table:" <> table_id
-  end
-
   defp table_topic(table_id) do
     "table:" <> table_id
   end
 
-  defp via_tuple(table_id) do
-    {:via, Registry, {LiveMenuOrder.Registry, process_name(table_id)}}
+  defp via_tuple(:table, table_id) do
+    {:via, Registry, {LiveMenuOrder.Registry, "table:" <> table_id}}
+  end
+
+  defp via_tuple(:last_added, table_id) do
+    {:via, Registry, {LiveMenuOrder.Registry, "last_added:" <> table_id}}
   end
 end
