@@ -3,9 +3,9 @@ import Config
 # Configure your database
 config :live_menu_order, LiveMenuOrder.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "mysecretpassword",
+  database: "anticar_crawler_dev",
   hostname: "localhost",
-  database: "live_menu_order_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
