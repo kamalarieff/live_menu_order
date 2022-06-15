@@ -25,6 +25,7 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import { CountUp } from 'countup.js';
+import anime from "animejs";
 
 let Hooks = {};
 Hooks.TotalNumber = {
@@ -41,6 +42,32 @@ Hooks.TotalNumber = {
     });
   }
 }
+
+Hooks.LastAdded = {
+  mounted() {
+    this.handleEvent("update_state", () => {
+      anime({
+        targets: this.el,
+        opacity: [0, 1],
+        translateY: [25, 0],
+      });
+    });
+  },
+  // updated() {
+  //   anime({
+  //     targets: this.el,
+  //     opacity: [0, 1],
+  //     translateY: [25, 0],
+  //   });
+  // },
+  // beforeUpdate() {
+  //   anime({
+  //     targets: this.el,
+  //     opacity: [1, 0],
+  //     translateY: [0, -10],
+  //   });
+  // },
+};
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})

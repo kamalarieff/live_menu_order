@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "animejs": "^3.2.1",
     "countup.js": "^2.2.0"
   }
 }
