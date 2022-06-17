@@ -25,7 +25,36 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import { CountUp } from 'countup.js';
-import anime from "animejs";
+import Alpine from "alpinejs";
+
+window.Alpine = Alpine;
+
+Alpine.data('cart', () => ({
+  isOpen: false,
+  init() {
+    gsap.from(this.$el, {
+      y: '100%',
+      duration: 0.7,
+      opacity: 0
+    });
+  },
+  toggle: {
+    ['@click']() {
+      gsap.to(this.$el, {
+        y: this.isOpen ? window.innerHeight - 100 : 100,
+        ease: 'power1.inOut',
+        duration: 0.3
+      });
+
+      // TODO: this looks better when there is a setTimeout
+      this.$el.scrollTop = 0;
+     
+      this.isOpen = !this.isOpen;
+    }
+  }
+}));
+
+Alpine.start();
 
 let Hooks = {};
 Hooks.TotalNumber = {
@@ -46,31 +75,28 @@ Hooks.TotalNumber = {
 Hooks.LastAdded = {
   mounted() {
     this.handleEvent("update_state", () => {
-      anime({
-        targets: this.el,
-        opacity: [0, 1],
-        translateY: [25, 0],
+      gsap.from(this.el, {
+        y: 25,
+        ease: 'power1.inOut',
+        opacity: 0,
+        duration: 0.3
       });
     });
   },
-  // updated() {
-  //   anime({
-  //     targets: this.el,
-  //     opacity: [0, 1],
-  //     translateY: [25, 0],
-  //   });
-  // },
-  // beforeUpdate() {
-  //   anime({
-  //     targets: this.el,
-  //     opacity: [1, 0],
-  //     translateY: [0, -10],
-  //   });
-  // },
 };
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
+let liveSocket = new LiveSocket("/live", Socket, {
+  params: {_csrf_token: csrfToken},
+  hooks: Hooks,
+  dom: {
+    onBeforeElUpdated(from, to) {
+      if (from._x_dataStack) {
+        window.Alpine.clone(from, to)
+      }
+    }
+  }
+});
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
