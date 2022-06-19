@@ -124,3 +124,8 @@
   100% { opacity: 0; }
 }
 
+#cart-bottom-sheet {
+  touch-action: pan-y;
+  border-top-left-radius: 4.5rem;
+  border-top-right-radius: 4.5rem;
+}

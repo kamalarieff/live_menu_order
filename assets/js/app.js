@@ -33,31 +33,13 @@ window.Alpine = Alpine;
 Alpine.data('cart', () => ({
   isOpen: false,
   init() {
-    // gsap.from(this.$el, {
-    //   y: '100%',
-    //   duration: 0.7,
-    //   opacity: 0
-    // });
-
-    const gesture = new DragGesture(this.$el, () => {
+    new DragGesture(this.$el, () => {
       if (this.isOpen == false ) {
-        gsap.to(this.$el, {
-          y: 100,
-          ease: 'power1.inOut',
-          duration: 0.3
-        });
-
         // TODO: this looks better when there is a setTimeout
         this.$el.scrollTop = 0;
        
         this.isOpen = true;
       } else {
-        gsap.to(this.$el, {
-          y: window.innerHeight - 100,
-          ease: 'power1.inOut',
-          duration: 0.3
-        });
-
         // TODO: this looks better when there is a setTimeout
         this.$el.scrollTop = 0;
        

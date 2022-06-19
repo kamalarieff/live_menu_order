@@ -55,8 +55,8 @@
 <div
   id="cart-bottom-sheet"
   x-data="cart"
-  class="w-full h-full px-12 py-2 fixed bottom-0 left-0 bg-sky-300 overflow-auto"
-  :style="isOpen ? {touchAction: 'pan-y', borderTopLeftRadius: '4.5rem', borderTopRightRadius: '4.5rem', transform: 'translateY(100px)'} : {touchAction: 'pan-y', borderTopLeftRadius: '4.5rem', borderTopRightRadius: '4.5rem', transform: 'translateY(calc(100% - 100px))'}"
+  class="w-full h-full px-12 py-2 fixed bottom-0 left-0 bg-sky-300 overflow-auto transition duration-300 ease-in-out"
+  :style="isOpen ? {transform: 'translateY(100px)'} : {transform: 'translateY(calc(100% - 100px))'}"
 >
   <div class="w-4/5 m-auto grid grid-cols-2 gap-2 h-36">
     <h3 class="mb-0">Total</h3>
