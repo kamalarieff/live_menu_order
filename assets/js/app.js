@@ -39,8 +39,8 @@ Alpine.data('cart', () => ({
     //   opacity: 0
     // });
 
-    const gesture = new DragGesture(this.$el, ({ dragging, delta: [_dx, dy] }) => {
-      if (dragging && dy < -3 ) {
+    const gesture = new DragGesture(this.$el, () => {
+      if (this.isOpen == false ) {
         gsap.to(this.$el, {
           y: 100,
           ease: 'power1.inOut',
@@ -51,7 +51,7 @@ Alpine.data('cart', () => ({
         this.$el.scrollTop = 0;
        
         this.isOpen = true;
-      } else if (dragging && dy > 3 ) {
+      } else {
         gsap.to(this.$el, {
           y: window.innerHeight - 100,
           ease: 'power1.inOut',
@@ -63,7 +63,7 @@ Alpine.data('cart', () => ({
        
         this.isOpen = false;
       }
-    }, { axis: 'y' });
+    }, { axis: 'y', axisThreshold: 2 });
   },
 }));
 
