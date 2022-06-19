@@ -26,32 +26,45 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import { CountUp } from 'countup.js';
 import Alpine from "alpinejs";
+import { DragGesture } from '@use-gesture/vanilla';
 
 window.Alpine = Alpine;
 
 Alpine.data('cart', () => ({
   isOpen: false,
   init() {
-    gsap.from(this.$el, {
-      y: '100%',
-      duration: 0.7,
-      opacity: 0
-    });
-  },
-  toggle: {
-    ['@click']() {
-      gsap.to(this.$el, {
-        y: this.isOpen ? window.innerHeight - 100 : 100,
-        ease: 'power1.inOut',
-        duration: 0.3
-      });
+    // gsap.from(this.$el, {
+    //   y: '100%',
+    //   duration: 0.7,
+    //   opacity: 0
+    // });
 
-      // TODO: this looks better when there is a setTimeout
-      this.$el.scrollTop = 0;
-     
-      this.isOpen = !this.isOpen;
-    }
-  }
+    const gesture = new DragGesture(this.$el, ({ dragging, delta: [_dx, dy] }) => {
+      if (dragging && dy < -3 ) {
+        gsap.to(this.$el, {
+          y: 100,
+          ease: 'power1.inOut',
+          duration: 0.3
+        });
+
+        // TODO: this looks better when there is a setTimeout
+        this.$el.scrollTop = 0;
+       
+        this.isOpen = true;
+      } else if (dragging && dy > 3 ) {
+        gsap.to(this.$el, {
+          y: window.innerHeight - 100,
+          ease: 'power1.inOut',
+          duration: 0.3
+        });
+
+        // TODO: this looks better when there is a setTimeout
+        this.$el.scrollTop = 0;
+       
+        this.isOpen = false;
+      }
+    }, { axis: 'y' });
+  },
 }));
 
 Alpine.start();
