@@ -39,7 +39,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     last_added = LastAddedState.value(last_added_name)
 
     total =
-      for {_id, item} <- order.order, reduce: 0 do
+      for {_id, item} <- order.order, reduce: 0.0 do
         acc ->
           item["total_price"] + acc
       end
@@ -54,7 +54,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
      assign(socket,
        menus: list_menus(),
        cart: cart,
-       total: total,
+       total: :erlang.float_to_binary(total, [decimals: 2]),
        table: table,
        order: order,
        last_added: last_added
@@ -150,7 +150,7 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
     %{cart_state: state, last_added: last_added} = payload
 
     total =
-      for {_id, item} <- socket.assigns.order.order, reduce: 0 do
+      for {_id, item} <- socket.assigns.order.order, reduce: 0.0 do
         acc ->
           item["total_price"] + acc
       end
@@ -160,6 +160,8 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
         acc ->
           item["total_price"] + acc
       end
+
+    total = :erlang.float_to_binary(total, [decimals: 2])
 
     {:noreply,
      socket
