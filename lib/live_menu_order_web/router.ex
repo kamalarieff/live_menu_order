@@ -35,6 +35,7 @@ defmodule LiveMenuOrderWeb.Router do
     live "/table/:table_id/menu", MenuLive.Index, :index
     live "/table/:table_id/order", OrderLive.Show, :show
     live "/menu/:id", MenuLive.Show, :show
+    live "/menu/:menu_id/table/:table_id", MenuLive.ShowTable, :show
 
     live "/admin/orders", OrderLive.Index, :index
     live "/admin/orders/new", OrderLive.Index, :new

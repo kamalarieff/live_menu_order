@@ -1,0 +1,21 @@
+<h1>Show Menu</h1>
+
+<ul>
+  <li>
+    <strong>Name:</strong>
+    <%= @menu.name %>
+  </li>
+</ul>
+
+<button 
+  phx-click="add"
+  phx-value-menu_id={@menu.id}
+  phx-value-menu_name={@menu.name}
+  phx-value-menu_price={@menu.price}
+>
+  Add
+</button>
+
+<%= live_redirect to: Routes.menu_index_path(@socket, :index, @table_id) do %>
+  Back to menu
+<% end %>

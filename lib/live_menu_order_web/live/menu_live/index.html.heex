@@ -21,7 +21,7 @@
     <%= for menu <- @menus do %>
       <tr id={"menu-#{menu.id}"}>
         <td>
-          <span><%= live_redirect menu.name, to: Routes.menu_show_path(@socket, :show, menu) %></span>
+          <span><%= live_redirect menu.name, to: Routes.menu_show_table_path(@socket, :show, menu, @table) %></span>
         </td>
         <td>RM <%= menu.price %></td>
         <td>
