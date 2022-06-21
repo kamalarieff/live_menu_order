@@ -32,22 +32,13 @@ window.Alpine = Alpine;
 
 Alpine.data("cart", () => ({
   isOpen: false,
-  height: 0,
   init() {
-    this.height = window.innerHeight - 100;
-
     gsap.from(this.$el, {
       y: window.innerHeight,
       opacity: 0,
     });
 
-    this.$watch("height", (height) => {
-      console.log("height", height);
-    });
-
     const open = () => {
-      console.log("in here open");
-
       gsap.to(this.$el, {
         y: 100,
         duration: 0.1,
@@ -59,8 +50,6 @@ Alpine.data("cart", () => ({
     };
 
     const close = () => {
-      console.log("in here close");
-
       gsap.to(this.$el, {
         y: window.innerHeight - 100,
         duration: 0.1,
@@ -83,11 +72,7 @@ Alpine.data("cart", () => ({
           });
 
           if (last) {
-            if (Math.abs(my) > threshold || (dy < 0 && vy > 0.3)) {
-              open();
-            } else {
-              close();
-            }
+            Math.abs(my) > threshold || (vy > 0.3 && dy < 0) ? open() : close();
           }
         } else {
           gsap.to(this.$el, {
