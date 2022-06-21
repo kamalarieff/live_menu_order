@@ -135,6 +135,10 @@ let liveSocket = new LiveSocket("/live", Socket, {
       if (from._x_dataStack) {
         window.Alpine.clone(from, to);
       }
+
+      if (from.id == "cart-bottom-sheet") {
+        to.style['transform'] = from.style['transform'];
+      }
     },
   },
 });
