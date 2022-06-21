@@ -125,6 +125,7 @@
 }
 
 #cart-bottom-sheet {
+  transform: translateY(calc(100% - 100px));
   touch-action: pan-y;
   border-top-left-radius: 4.5rem;
   border-top-right-radius: 4.5rem;

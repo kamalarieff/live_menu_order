@@ -38,8 +38,8 @@ Alpine.data("cart", () => ({
 
     gsap.from(this.$el, {
       y: window.innerHeight,
-      opacity: 0
-    })
+      opacity: 0,
+    });
 
     this.$watch("height", (height) => {
       console.log("height", height);
@@ -73,26 +73,17 @@ Alpine.data("cart", () => ({
 
     new DragGesture(
       this.$el,
-      ({
-        movement: [, my],
-        velocity: [, vy],
-        direction: [, dy],
-        last,
-        xy: [, y],
-        initial: [, initialY],
-      }) => {
-        console.log({ y, initialY, my });
+      ({ movement: [, my], velocity: [, vy], direction: [, dy], last }) => {
+        const threshold = window.innerHeight * 0.4;
 
         if (this.isOpen == false) {
           gsap.to(this.$el, {
-            y: y + my,
+            y: window.innerHeight - 100 + my,
             duration: 0.3,
           });
-          
+
           if (last) {
-            if (dy >= 0) {
-              close();
-            } else if (vy > 0.3) {
+            if (Math.abs(my) > threshold || (dy < 0 && vy > 0.3)) {
               open();
             } else {
               close();
@@ -105,28 +96,13 @@ Alpine.data("cart", () => ({
           });
 
           if (last) {
-            my > window.innerHeight * 0.5 || (vy > 0.3 && dy >= 0)
-              ? close()
-              : open();
+            my > threshold || (vy > 0.3 && dy >= 0) ? close() : open();
           }
         }
-
-        // if (this.height >= 100 && my < 0) {
-        //   gsap.to(this.$el, {
-        //     y: currentHeight + my,
-        //   });
-        //   this.height = this.height + my;
-        // } else if (this.height <= window.innerHeight - 100 && my > 0) {
-        //   gsap.to(this.$el, {
-        //     y: currentHeight + my,
-        //   });
-        //   this.height = this.height + my;
-        // }
       },
       {
         axis: "y",
         rubberband: true,
-        bounds: { top: 0, bottom: window.innerHeight }
       }
     );
   },
