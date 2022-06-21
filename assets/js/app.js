@@ -51,8 +51,8 @@ Alpine.data("cart", () => ({
       gsap.to(this.$el, {
         y: 100,
         duration: 0.1,
+        delay: 0.2,
         onComplete: () => {
-          // this.height = 100;
           this.isOpen = true;
         },
       });
@@ -64,8 +64,8 @@ Alpine.data("cart", () => ({
       gsap.to(this.$el, {
         y: window.innerHeight - 100,
         duration: 0.1,
+        delay: 0.2,
         onComplete: () => {
-          // this.height = window.innerHeight - 100;
           this.isOpen = false;
         },
       });
@@ -81,52 +81,35 @@ Alpine.data("cart", () => ({
         xy: [, y],
         initial: [, initialY],
       }) => {
-        const currentHeight = this.height;
-
         console.log({ y, initialY, my });
 
         if (this.isOpen == false) {
           gsap.to(this.$el, {
             y: y + my,
             duration: 0.3,
-            onComplete: () => {
-              if (last) {
-                if (dy >= 0) {
-                  close();
-                } else if (vy > 0.3) {
-                  open();
-                } else {
-                  close();
-                }
-              }
-              // else {
-              //   this.height = currentHeight + my;
-              // }
-            },
           });
+          
+          if (last) {
+            if (dy >= 0) {
+              close();
+            } else if (vy > 0.3) {
+              open();
+            } else {
+              close();
+            }
+          }
         } else {
           gsap.to(this.$el, {
             y: 100 + my,
             duration: 0.3,
-            onComplete: () => {
-              if (last) {
-                my > window.innerHeight * 0.5 || (vy > 0.3 && dy >= 0)
-                  ? close()
-                  : open();
-              }
-              // else {
-              //   this.height = currentHeight + my;
-              // }
-            },
           });
-        }
 
-        if (last) {
-          console.log('in here last')
+          if (last) {
+            my > window.innerHeight * 0.5 || (vy > 0.3 && dy >= 0)
+              ? close()
+              : open();
+          }
         }
-        console.log('in here still dragging?')
-        
-
 
         // if (this.height >= 100 && my < 0) {
         //   gsap.to(this.$el, {
@@ -143,6 +126,7 @@ Alpine.data("cart", () => ({
       {
         axis: "y",
         rubberband: true,
+        bounds: { top: 0, bottom: window.innerHeight }
       }
     );
   },
