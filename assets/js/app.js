@@ -87,7 +87,12 @@ Alpine.data("cart", () => ({
       },
       {
         axis: "y",
-        rubberband: true,
+        from: [0, 0],
+        bounds: () => {
+          const top =
+            this.isOpen == false ? (window.innerHeight - 100) * -1 : -100;
+          return { top: top };
+        },
       }
     );
   },
@@ -137,7 +142,7 @@ let liveSocket = new LiveSocket("/live", Socket, {
       }
 
       if (from.id == "cart-bottom-sheet") {
-        to.style['transform'] = from.style['transform'];
+        to.style["transform"] = from.style["transform"];
       }
     },
   },

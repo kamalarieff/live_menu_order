@@ -5,6 +5,19 @@
 
 <section class="row">
   <article class="column">
+    <ul>
+      <li>
+        <%= link "Admin Menus", to: Routes.admin_menu_index_path(@conn, :index) %>
+      </li>
+      <li>
+        <%= link "Admin Tables", to: Routes.table_index_path(@conn, :index) %>
+      </li>
+    </ul>
+  </article>
+</section>
+
+<section class="row">
+  <article class="column">
     <h2>Resources</h2>
     <ul>
       <li>

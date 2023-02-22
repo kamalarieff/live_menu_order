@@ -1,0 +1,1 @@
+alias LiveMenuOrder.{Tables,Orders}

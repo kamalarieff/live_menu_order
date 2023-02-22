@@ -141,11 +141,6 @@ defmodule LiveMenuOrderWeb.MenuLive.Index do
   end
 
   @impl true
-  def handle_event("click_order", %{"table_id" => table_id}, socket) do
-    {:noreply, socket |> push_redirect(to: Routes.order_show_path(socket, :show, table_id))}
-  end
-
-  @impl true
   def handle_info(%{event: "update_state", payload: payload}, socket) do
     %{cart_state: state, last_added: last_added} = payload
 
